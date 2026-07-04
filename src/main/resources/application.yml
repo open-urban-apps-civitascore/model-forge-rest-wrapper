@@ -1,0 +1,46 @@
+server:
+  # 8001 by default: 8000 is commonly taken by the legacy pre-pivot Model Forge
+  # container. The marketplace switches targets via MODELFORGE_BASE_URL.
+  port: ${MODELFORGE_HTTP_PORT:8001}
+
+spring:
+  application:
+    name: model-forge-rest-wrapper
+  # The wrapper has no migrations of its own; Model Forge runs its own Flyway
+  # bean (modelForgeFlyway, own history table). Boot's default Flyway would look
+  # into the same schema (the DB user's search_path) and fail over the missing
+  # flyway_schema_history table.
+  autoconfigure:
+    exclude: org.springframework.boot.flyway.autoconfigure.FlywayAutoConfiguration
+  datasource:
+    # One-liner to provide this database:
+    #   docker run -d --name mf-wrapper-postgres -p 5433:5432 \
+    #     -e POSTGRES_DB=model_forge -e POSTGRES_USER=model_forge -e POSTGRES_PASSWORD=model_forge \
+    #     postgres:16
+    url: ${MODELFORGE_DB_URL:jdbc:postgresql://localhost:5433/model_forge}
+    username: ${MODELFORGE_DB_USERNAME:model_forge}
+    password: ${MODELFORGE_DB_PASSWORD:model_forge}
+    driver-class-name: org.postgresql.Driver
+
+# The embedded Model Forge registry (starter autoconfiguration): its own Flyway
+# migration history inside the model_forge schema, separate from any host tables.
+model-forge:
+  registry:
+    backend: postgres
+    schema: model_forge
+    migration-table: model_forge_schema_history
+
+wrapper:
+  # Must match the marketplace's MODELFORGE_API_KEY (X-API-Key header).
+  api-key: ${MODELFORGE_API_KEY:your-secret-key-here}
+  # Namespace for old-style deterministic dataset URNs (pre-pivot defaults).
+  urn:
+    scope: ${MODELFORGE_URN_SCOPE:platform}
+    owner: ${MODELFORGE_URN_OWNER:civitas}
+    domain: ${MODELFORGE_URN_DOMAIN:common}
+    version: ${MODELFORGE_URN_VERSION:1.0.0}
+
+logging:
+  level:
+    de.civitascore.modelforge: INFO
+    de.openurbanapps.mfwrapper: DEBUG

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <!-- Must match the Spring Boot version the model-forge modules build against
+         (their root pom; Boot 4 moved the JDBC/Flyway autoconfiguration packages). -->
+    <version>4.0.5</version>
+    <relativePath/>
+  </parent>
+
+  <groupId>de.openurbanapps</groupId>
+  <artifactId>model-forge-rest-wrapper</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+  <name>Model Forge REST Wrapper</name>
+  <description>
+    Thin REST host around the embedded Model Forge facade, re-exposing the
+    pre-pivot HTTP surface the marketplace add-on prototype consumes.
+    Development aid only — not a deployment artifact.
+  </description>
+
+  <properties>
+    <!-- Matches the JDK the model-forge modules are built with (their enforcer requires 25+). -->
+    <java.version>25</java.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+
+    <!-- Embedded Model Forge: facade + postgres registry + Flyway migrations.
+         Built locally from the model-forge repo: ./mvnw install -DskipTests -->
+    <dependency>
+      <groupId>de.civitascore</groupId>
+      <artifactId>core-model-forge-spring-boot-starter</artifactId>
+      <version>0.1.0-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+</project>
